@@ -3948,6 +3948,11 @@ int main(int argc, char *argv[]) {
 	g_fpga_count = opt_aws_fpgas;
 	
 	applog(LOG_DEBUG, "Initializing AWS FGPA");
+
+  /* initialize the fpga_mgmt library */
+  rc = fpga_mgmt_init();
+
+  applog(LOG_DEBUG, "Initializing AWS FGPA");
     rc = fpga_pci_init();
 	if (rc) {
 		applog(LOG_ERR, "Unable to initialize AWS FGPA");
