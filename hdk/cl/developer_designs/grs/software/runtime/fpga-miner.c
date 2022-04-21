@@ -76,7 +76,7 @@ int slot_id;
 int check_afi_ready(int slot);
 
 int check_afi_ready(int slot_id) {
-    struct fpga_mgmt_image_info info = {0}; 
+    struct fpga_mgmt_image_info info = {0};
     int rc;
 
     rc = fpga_mgmt_describe_local_image(slot_id, &info,0);
@@ -112,7 +112,7 @@ int check_afi_ready(int slot_id) {
                              "the expected values.");
         }
     }
-    
+
     return rc;
 
 out:
@@ -1249,12 +1249,12 @@ static bool submit_upstream_work(CURL *curl, struct work *work)
 
 			bin2hex(ntimestr, (const unsigned char *)(&ntime), 4);
 			bin2hex(noncestr, (const unsigned char *)(&nonce), 4);
-			
-			
+
+
     char noncehex[16], nonce2hex[80];
     char votehex[16] = { 0 };
 
-			
+
 			if (opt_algo == ALGO_DECRED) {
 				xnonce2str = abin2hex((unsigned char*)(&work->data[36]), stratum.xnonce1_size);
 			} else if (opt_algo == ALGO_SIA) {
@@ -1730,7 +1730,7 @@ static bool get_work(struct thr_info *thr, struct work *work)
 		memset(work->target, 0x00, sizeof(work->target));
 		return true;
 	}
-	
+
 	/* fill out work request message */
 	wc = (struct workio_cmd *) calloc(1, sizeof(*wc));
 	if (!wc)
@@ -1853,7 +1853,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			work->data[9 + i] = be32dec((uint32_t *) merkle_root + i);
 
 		if (opt_algo == ALGO_DECRED) {
-			
+
 			uint16_t vote;
 			for (i = 0; i < 8; i++) // reversed prevhash
 				work->data[1 + i] = swab32(work->data[1 + i]);
@@ -1906,7 +1906,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			for (i = 0; i <= 18; i++)
 				work->data[i] = swab32(work->data[i]);
 		}
-		
+
 		//
 		// Test Data
 		//
@@ -3345,7 +3345,7 @@ static void parse_cmdline(int argc, char *argv[])
 			argv[0], argv[optind]);
 		show_usage_and_exit(1);
 	}
-	
+
 	if (opt_vote == 9999) {
 		opt_vote = 0; // default, don't vote
 	}
@@ -3413,19 +3413,19 @@ static bool initialize_aws_miner(void *thr, int slot_id)
 	struct thr_info *mythr = thr;
 	struct fpga_info *fpga = mythr->fpga;
 	char short_name[5];
-	
+
 	memset(fpga->name, 0, 11);
 	memset(fpga->short_name, 0, 5);
 
 	sprintf(short_name, "AWS%d", slot_id);
-	
+
 	strcpy(fpga->name, "AWS_FPGA");
 	strcpy(fpga->short_name, short_name);
 	fpga->type = FPGA_SERIAL;
 	fpga->device_fd = -1;
 	fpga->timeout = opt_scantime;
 	fpga->Hs = 0.000001;	// Default Hs(hashes/sec) to 1MH/s until share is found and hashrate can be calculated
-			
+
 	fpga->slot_id = slot_id;
 	fpga->pf_id = FPGA_APP_PF;
 	fpga->bar_id = APP_PF_BAR0;
@@ -3437,7 +3437,7 @@ extern void calc_hash(unsigned char *data, const unsigned char *hash)
 {
 	uint32_t endian_data[48];
 	uint32_t *data32 = (uint32_t *)(data);
-	
+
 	switch (opt_algo) {
 		case ALGO_DMD_GR:
 		case ALGO_GROESTL:
@@ -3517,7 +3517,7 @@ extern void calc_midstate(unsigned char *data, const unsigned char *midstate)
 			applog(LOG_ERR, "ERROR: Midstate option not supported for this algo");
 	}
 }
-					
+
 static void *aws_miner_thread(void *userdata)
 {
 	struct thr_info *mythr = userdata;
@@ -3532,7 +3532,7 @@ static void *aws_miner_thread(void *userdata)
 	uint32_t nonce, hash[8];
 	int64_t hash_count;
 	struct timeval tv_start, tv_finish, elapsed, tv_end, diff;
-	
+
 	unsigned char *b = (unsigned char *)send_buf;
 	uint32_t *b32 = (uint32_t *)send_buf;
 	uint32_t *data32 = (uint32_t *)data;
@@ -3555,7 +3555,7 @@ static void *aws_miner_thread(void *userdata)
 	}
 
 	nonce = 0;
-		
+
 	while (1) {
 		unsigned long hashes_done;
 		int rc;
@@ -3581,7 +3581,7 @@ static void *aws_miner_thread(void *userdata)
 		else {
 			memcpy(data, (unsigned char*)work.data, g_fpga_data_len);
 		}
-		
+
 		if ( g_fpga_use_target ) {
 			if ( g_fpga_swap_data )
 				memcpy(data + g_fpga_mid_len + g_fpga_data_len, (unsigned char*)work.target + 28, 4);  // Pass H7 Target To FPGA
@@ -3639,7 +3639,7 @@ static void *aws_miner_thread(void *userdata)
 				printf(",0x%02X", cc[i]);
 			}
 			printf("\n");
-		
+
 			printf("Block Data2:");
 			cc = (unsigned char *)data;
 			for (i=0;i<144;i++) {
@@ -3673,19 +3673,19 @@ static void *aws_miner_thread(void *userdata)
 
 			memset(nonce_buf,0,4);
 
-			
+
 			if (opt_algo == ALGO_TRIBUS)
 				addr = UINT64_C(0x594);
 			else
 				addr = UINT64_C(0x554);
-			
+
 			for (i = 0; i < 10; i++) {
 				rc = fpga_pci_peek(pci_bar_handle, addr, &value);
 				if (rc) {
 					applog(LOG_ERR, "%s: Read error on AWS FPGA slot %d", fpga->short_name, fpga->slot_id);
 					continue;
 				}
-				
+
 				if ((value != 0) && (value != old_value)) {
 					old_value = value;
 					nonce = value;
@@ -3714,7 +3714,7 @@ static void *aws_miner_thread(void *userdata)
 			// Calculate Hash Using Nonce From FPGA
 			work.data[g_fpga_nonce_idx] = nonce;
 			calc_hash((unsigned char *)work.data, (unsigned char *)hash);
-			
+
 			// Check If Hash < Target Sent To FPGA
 			if (swab32(hash[7]) > swab32(target[7])) {
 				fpga->hw_errors++;
@@ -3751,10 +3751,10 @@ static void *aws_miner_thread(void *userdata)
 		pthread_mutex_lock(&stats_lock);
 		thr_hashrates[thr_id] = fpga->hashrate;
 		pthread_mutex_unlock(&stats_lock);
-		
+
 		// Display FPGA Summary
 		if (display_summary != opt_fpga_summary) {
-			
+
 			display_summary = opt_fpga_summary;
 
 			applog(LOG_WARNING, "----------------- FPGA Summary for %s -------------------", fpga->device_path);
@@ -3766,11 +3766,11 @@ static void *aws_miner_thread(void *userdata)
 
 out:
 	tq_freeze(mythr->q);
-	
+
 	pthread_mutex_lock(&stats_lock);
 	thr_hashrates[thr_id] = 0;
 	pthread_mutex_unlock(&stats_lock);
-	
+
 	return NULL;
 }
 
@@ -3801,7 +3801,7 @@ static void *key_monitor_thread(void *userdata)
 
 	double hashrate, network_difficulty, block_difficulty, diff_factor;
 	int i, ch, day, hour, min, sec, total_sec;
-	
+
 	switch (opt_algo) {
 		case ALGO_DMD_GR:
 		case ALGO_GROESTL:
@@ -3811,7 +3811,7 @@ static void *key_monitor_thread(void *userdata)
 		default:
 			diff_factor = opt_diff_factor;
 	}
-	
+
 	while(true)
 	{
 		sleep(1);
@@ -3832,7 +3832,7 @@ static void *key_monitor_thread(void *userdata)
 				sec  = total_sec % 60;
 
 				applog(LOG_WARNING, "************************** Mining Summary **************************");
-				
+
 				if (have_stratum)
 				{
 					struct stratum_ctx *sctx = &stratum;
@@ -3843,7 +3843,7 @@ static void *key_monitor_thread(void *userdata)
 					block_difficulty = stratum_diff / diff_factor;
 
 				}
-				
+
 				applog(LOG_WARNING, "Hash: %1.2f Mh/s  A: %u  R: %u (%1.2f%%)  HW: %u  BF: %d"
 					,(double)global_hashrate/1000000.0
 					,accepted_count
@@ -3937,7 +3937,7 @@ int main(int argc, char *argv[]) {
 	} else if(opt_algo == ALGO_DECRED || opt_algo == ALGO_SIA) {
 		have_gbt = false;
 	}
-	
+
 	if(!opt_use_cpu)
 		g_miner_count = 0;
 	else
@@ -3946,14 +3946,17 @@ int main(int argc, char *argv[]) {
 	// Hardcode Miner To Use AWS FPGA Slots
 	opt_use_cpu = false;
 	g_fpga_count = opt_aws_fpgas;
-	
+
+  /* initialize the fpga_mgmt library */
+  rc = fpga_mgmt_init();
+
 	applog(LOG_DEBUG, "Initializing AWS FGPA");
     rc = fpga_pci_init();
 	if (rc) {
 		applog(LOG_ERR, "Unable to initialize AWS FGPA");
 		return 1;
 	}
-	
+
     slot_id = 0;
 	for (i = 0; i < opt_aws_fpgas; i++) {
 		applog(LOG_DEBUG, "Checking AWS FGPA on slot %d", i);
@@ -4027,7 +4030,7 @@ int main(int argc, char *argv[]) {
 			g_fpga_swap_data = true;
 			g_fpga_nonce_idx = 19;
 	}
-	
+
 	if (!opt_benchmark && !rpc_url) {
 		fprintf(stderr, "%s: no URL supplied\n", argv[0]);
 		show_usage_and_exit(1);
@@ -4107,7 +4110,7 @@ int main(int argc, char *argv[]) {
 			applog(LOG_DEBUG, "Binding process to cpu mask %x", opt_affinity);
 		affine_to_cpu_mask(-1, (unsigned long)opt_affinity);
 	}
-	
+
 	work_restart = (struct work_restart*) calloc(g_miner_count, sizeof(*work_restart));
 	if (!work_restart)
 		return 1;
@@ -4190,7 +4193,7 @@ int main(int argc, char *argv[]) {
 
 	applog(LOG_INFO, "Attempting to start %d miner threads using '%s' algorithm", g_miner_count, algo_names[opt_algo]);
 	thr_idx = 0;
-	
+
 	// Start CPU Mining Threads
 //	if (opt_use_cpu) {
 //		for (i = 0; i < opt_n_threads; i++) {
@@ -4224,7 +4227,7 @@ int main(int argc, char *argv[]) {
 			applog(LOG_ERR, "ERROR: Unable to allocate AWS FPGA Info");
 			return 1;
 		}
-		
+
 		initialize_aws_miner(thr, i);
 
 		err = thread_create(thr, aws_miner_thread);
@@ -4234,7 +4237,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	applog(LOG_INFO, "\t%d AWS FPGA miner threads started.", opt_aws_fpgas);
-	
+
 	// Start Mining Summary Thread
 	thr = &thr_info[g_miner_count + 4];
 	thr->id = g_miner_count + 4;
@@ -4245,7 +4248,7 @@ int main(int argc, char *argv[]) {
 		applog(LOG_ERR, "key monitor thread create failed");
 		return 1;
 	}
-	
+
 	// Main Loop - Wait for workio thread to exit
 	pthread_join(thr_info[work_thr_id].pth, NULL);
 
